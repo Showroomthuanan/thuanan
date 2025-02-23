@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -151,9 +152,9 @@
       }
 
       // Kiểm tra tên khách hàng chỉ chứa chữ
-      if(!/^[a-zA-Z\s]+$/.test(order.tenKH)) {
-        Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
-        return;
+      if(!/^[\p{L}\s]+$/u.test(order.tenKH)) {
+  Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
+  return;
       }
 
       // Kiểm tra ngày cọc không được là ngày trong tương lai
