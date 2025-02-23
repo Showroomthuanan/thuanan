@@ -1,133 +1,179 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nhu Cầu Xe Tháng 3 - Showroom Thuận An</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <!-- Tailwind CSS và các thư viện cần thiết -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script defer src="https://unpkg.com/lucide@latest"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
+  <style>
+    /* Hiệu ứng cho input */
+    .form-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <div class="container mx-auto py-10 px-4 md:px-10">
-    <h2 class="text-3xl font-bold text-center mb-6 text-blue-600 flex justify-center items-center gap-2">
-      <i data-lucide="truck" class="w-8 h-8"></i>
-      Nhu Cầu Xe Tháng 3 - Showroom Thuận An
-    </h2>
-    
-    <div class="bg-white shadow-lg rounded-xl p-6 mb-6">
-      <h3 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-        <i data-lucide="plus-circle"></i> Thêm Đơn Hàng
-      </h3>
-      <form id="orderForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <select class="border p-3 rounded-lg select2" id="tuVanBH">
-          <option value="">🔹 Chọn Tư Vấn BH</option>
-          <option>Đinh Trọng Nhân</option>
-          <option>Lê Mai Anh</option>
-          <option>Lê Quốc Thịnh</option>
-          <option>Lương Thế Ngọc</option>
-          <option>Nguyễn Dư Thuận</option>
-          <option>Nguyễn Hoàng Phúc</option>
-          <option>Nguyễn Minh Trung</option>
-          <option>Nguyễn Thiện Thảo</option>
-          <option>Nguyễn Văn Giáp</option>
-          <option>Tất Bách Tường</option>
-          <option>Thành Ngọc Vinh</option>
-          <option>Võ Minh Tuấn</option>
-          <option>Vũ Văn Đạt</option>
-          <option>Trần Thị Nguyệt Bạch</option>
-          <option>Lê Nhựt Quang</option>
-          <option>Phạm Trọng Huy</option>
-          <option>Vũ Viết Hải</option>
-          <option>Nguyễn Anh Tuấn</option>
-          <option>Nguyễn Trần Hoàng Thanh</option>
-          <option>Nguyễn Hoàng Thạch</option>
-          <option>Lý Kim Vinh</option>
-          <option>Bùi Anh Tài</option>
-          <option>Vũ Thị Trang</option>
-        </select>
-        <select class="border p-3 rounded-lg select2" id="dongXe">
-          <option value="">🚘 Chọn Dòng Xe</option>
-          <option>VF3</option>
-          <option>VF5</option>
-          <option>VF6</option>
-          <option>VF7</option>
-          <option>VF8</option>
-          <option>VF9</option>
-        </select>
-        <input type="text" placeholder="🏷️ Phiên Bản" class="border p-3 rounded-lg w-full" id="phienBan">
-        <input type="text" placeholder="🎨 Ngoại Thất" class="border p-3 rounded-lg w-full" id="ngoaiThat">
-        <input type="text" placeholder="🛋️ Nội Thất" class="border p-3 rounded-lg w-full" id="noiThat">
-        <input type="text" placeholder="📌 VSO" class="border p-3 rounded-lg w-full" id="vso">
-        <input type="text" placeholder="👤 Tên KH" class="border p-3 rounded-lg w-full" id="tenKH">
-        <input type="date" class="border p-3 rounded-lg w-full" id="ngayCoc">
-        <input type="text" placeholder="💰 Tình Trạng Thanh Toán" class="border p-3 rounded-lg w-full" id="tinhTrangThanhToan">
-        <button type="button" class="col-span-1 md:col-span-2 bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-transform hover:scale-105" onclick="themDonHang()">
-          <i data-lucide="plus"></i> Thêm Đơn Hàng
-        </button>
-      </form>
-    </div>
-    
-    <div class="bg-white shadow-lg rounded-xl p-6">
-      <h3 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-        <i data-lucide="list"></i> Danh Sách Đơn Hàng (<span id="totalOrders">0</span>)
-      </h3>
-      <!-- Mục tìm kiếm đơn hàng -->
-      <div class="mb-4">
-        <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm đơn hàng..." class="border p-3 rounded-lg w-full">
+<body class="bg-gray-50 text-gray-800">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 shadow-md">
+    <h1 class="text-4xl font-bold text-center text-white">Nhu Cầu Xe Tháng 3 - Showroom Thuận An</h1>
+  </header>
+
+  <!-- Slider hình ảnh động -->
+  <section id="dynamicImages" class="relative overflow-hidden rounded-xl mx-auto my-8 max-w-5xl">
+    <img id="sliderImage" src="https://via.placeholder.com/1200x400?text=Image+1" alt="Dynamic Image" class="w-full h-64 object-cover transition-opacity duration-700 ease-in-out">
+  </section>
+
+  <main class="container mx-auto py-10 px-4">
+    <!-- Phần Form Thêm Đơn Hàng -->
+    <section class="mb-10">
+      <div class="bg-white rounded-xl shadow-xl p-8">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-700 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-6 h-6"></i> Thêm Đơn Hàng
+        </h2>
+        <form id="orderForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <select class="border border-gray-300 p-3 rounded-lg form-input select2" id="tuVanBH">
+            <option value="">🔹 Chọn Tư Vấn BH</option>
+            <option>Đinh Trọng Nhân</option>
+            <option>Lê Mai Anh</option>
+            <option>Lê Quốc Thịnh</option>
+            <option>Lương Thế Ngọc</option>
+            <option>Nguyễn Dư Thuận</option>
+            <option>Nguyễn Hoàng Phúc</option>
+            <option>Nguyễn Minh Trung</option>
+            <option>Nguyễn Thiện Thảo</option>
+            <option>Nguyễn Văn Giáp</option>
+            <option>Tất Bách Tường</option>
+            <option>Thành Ngọc Vinh</option>
+            <option>Võ Minh Tuấn</option>
+            <option>Vũ Văn Đạt</option>
+            <option>Trần Thị Nguyệt Bạch</option>
+            <option>Lê Nhựt Quang</option>
+            <option>Phạm Trọng Huy</option>
+            <option>Vũ Viết Hải</option>
+            <option>Nguyễn Anh Tuấn</option>
+            <option>Nguyễn Trần Hoàng Thanh</option>
+            <option>Nguyễn Hoàng Thạch</option>
+            <option>Lý Kim Vinh</option>
+            <option>Bùi Anh Tài</option>
+            <option>Vũ Thị Trang</option>
+          </select>
+          <select class="border border-gray-300 p-3 rounded-lg form-input select2" id="dongXe">
+            <option value="">🚘 Chọn Dòng Xe</option>
+            <option>VF3</option>
+            <option>VF5</option>
+            <option>VF6</option>
+            <option>VF7</option>
+            <option>VF8</option>
+            <option>VF9</option>
+          </select>
+          <input type="text" placeholder="🏷️ Phiên Bản" class="border border-gray-300 p-3 rounded-lg form-input" id="phienBan">
+          <input type="text" placeholder="🎨 Ngoại Thất" class="border border-gray-300 p-3 rounded-lg form-input" id="ngoaiThat">
+          <input type="text" placeholder="🛋️ Nội Thất" class="border border-gray-300 p-3 rounded-lg form-input" id="noiThat">
+          <input type="text" placeholder="📌 VSO" class="border border-gray-300 p-3 rounded-lg form-input" id="vso">
+          <input type="text" placeholder="👤 Tên KH" class="border border-gray-300 p-3 rounded-lg form-input" id="tenKH">
+          <input type="date" class="border border-gray-300 p-3 rounded-lg form-input" id="ngayCoc">
+          <input type="text" placeholder="💰 Tình Trạng Thanh Toán" class="border border-gray-300 p-3 rounded-lg form-input" id="tinhTrangThanhToan">
+          <button type="button" class="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-transform transform hover:scale-105" onclick="themDonHang()">
+            <i data-lucide="plus" class="w-5 h-5 inline-block"></i> Thêm Đơn Hàng
+          </button>
+        </form>
       </div>
-      <button class="mb-4 bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded" onclick="exportToExcel()">📤 Xuất Excel</button>
-      <table class="w-full border-collapse border border-gray-300" id="orderTable">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border p-2">Tư Vấn BH</th>
-            <th class="border p-2">Dòng Xe</th>
-            <th class="border p-2">Phiên Bản</th>
-            <th class="border p-2">Ngoại Thất</th>
-            <th class="border p-2">Nội Thất</th>
-            <th class="border p-2">VSO</th>
-            <th class="border p-2">Tên KH</th>
-            <th class="border p-2">Ngày Cọc</th>
-            <th class="border p-2">Thanh Toán</th>
-            <th class="border p-2">Thời Gian Nhập Liệu</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-  
-  <!-- Script tích hợp localStorage -->
+    </section>
+
+    <!-- Phần Hiển Thị Danh Sách Đơn Hàng -->
+    <section>
+      <div class="bg-white rounded-xl shadow-xl p-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <h2 class="text-2xl font-semibold text-gray-700 flex items-center gap-2">
+            <i data-lucide="list" class="w-6 h-6"></i> Danh Sách Đơn Hàng (<span id="totalOrders">0</span>)
+          </h2>
+          <div class="mt-4 md:mt-0">
+            <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm đơn hàng..." class="border border-gray-300 p-3 rounded-lg form-input w-full md:w-64">
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200" id="orderTable">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Tư Vấn BH</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Dòng Xe</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Phiên Bản</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Ngoại Thất</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Nội Thất</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">VSO</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Tên KH</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Ngày Cọc</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Thanh Toán</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Thời Gian Nhập Liệu</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <!-- Các dòng dữ liệu đơn hàng sẽ được thêm tại đây -->
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-4">
+          <button class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded" onclick="exportToExcel()">
+            <i data-lucide="download" class="w-5 h-5 inline-block"></i> Xuất Excel
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Script xử lý chức năng và slider hình ảnh -->
   <script>
-    // Khi trang được tải, lấy dữ liệu từ localStorage và hiển thị lên bảng
     $(document).ready(function(){
+      // Khởi tạo Select2
+      $('.select2').select2();
+      
+      // Khởi tạo dữ liệu đơn hàng từ localStorage
       let orders = JSON.parse(localStorage.getItem("orders")) || [];
       orders.forEach(order => {
         let row = `<tr>
-          <td class='border p-2'>${order.tuVanBH}</td>
-          <td class='border p-2'>${order.dongXe}</td>
-          <td class='border p-2'>${order.phienBan}</td>
-          <td class='border p-2'>${order.ngoaiThat}</td>
-          <td class='border p-2'>${order.noiThat}</td>
-          <td class='border p-2'>${order.vso}</td>
-          <td class='border p-2'>${order.tenKH}</td>
-          <td class='border p-2'>${order.ngayCoc}</td>
-          <td class='border p-2'>${order.tinhTrangThanhToan}</td>
-          <td class='border p-2'>${order.time}</td>
+          <td class="px-4 py-3">${order.tuVanBH}</td>
+          <td class="px-4 py-3">${order.dongXe}</td>
+          <td class="px-4 py-3">${order.phienBan}</td>
+          <td class="px-4 py-3">${order.ngoaiThat}</td>
+          <td class="px-4 py-3">${order.noiThat}</td>
+          <td class="px-4 py-3">${order.vso}</td>
+          <td class="px-4 py-3">${order.tenKH}</td>
+          <td class="px-4 py-3">${order.ngayCoc}</td>
+          <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
+          <td class="px-4 py-3">${order.time}</td>
         </tr>`;
         $("#orderTable tbody").append(row);
       });
       $("#totalOrders").text(orders.length);
+      
+      // Slider hình ảnh động
+      var images = [
+        'https://via.placeholder.com/1200x400?text=Image+1',
+        'https://via.placeholder.com/1200x400?text=Image+2',
+        'https://via.placeholder.com/1200x400?text=Image+3'
+      ];
+      var currentImage = 0;
+      setInterval(function() {
+        currentImage = (currentImage + 1) % images.length;
+        $('#sliderImage').fadeOut(500, function() {
+          $(this).attr('src', images[currentImage]).fadeIn(500);
+        });
+      }, 3000);
     });
 
-    // Hàm thêm đơn hàng và lưu vào localStorage
     function themDonHang() {
       let order = {
         tuVanBH: $("#tuVanBH").val().trim(),
@@ -142,71 +188,62 @@
         time: new Date().toLocaleString('vi-VN')
       };
 
-      // Lấy dữ liệu đã lưu (hoặc khởi tạo mảng nếu chưa có)
       let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-      // Kiểm tra bắt buộc nhập các trường
       if(Object.values(order).some(val => val === "")) {
         Swal.fire("Lỗi!", "Vui lòng nhập đầy đủ thông tin!", "error");
         return;
       }
 
-      // Kiểm tra tên khách hàng chỉ chứa chữ
       if(!/^[\p{L}\s]+$/u.test(order.tenKH)) {
-  Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
-  return;
+        Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
+        return;
       }
 
-      // Kiểm tra ngày cọc không được là ngày trong tương lai
       if(new Date(order.ngayCoc) > new Date()){
         Swal.fire("Lỗi!", "Ngày cọc không thể là ngày trong tương lai!", "error");
         return;
       }
 
-      // Kiểm tra trùng VSO
       if(orders.some(o => o.vso === order.vso)) {
         Swal.fire("Lỗi!", "VSO đã tồn tại!", "error");
         return;
       }
 
-      // Thêm đơn hàng mới vào mảng và cập nhật localStorage
       orders.push(order);
       localStorage.setItem("orders", JSON.stringify(orders));
 
-      // Cập nhật bảng hiển thị
       let row = `<tr>
-        <td class='border p-2'>${order.tuVanBH}</td>
-        <td class='border p-2'>${order.dongXe}</td>
-        <td class='border p-2'>${order.phienBan}</td>
-        <td class='border p-2'>${order.ngoaiThat}</td>
-        <td class='border p-2'>${order.noiThat}</td>
-        <td class='border p-2'>${order.vso}</td>
-        <td class='border p-2'>${order.tenKH}</td>
-        <td class='border p-2'>${order.ngayCoc}</td>
-        <td class='border p-2'>${order.tinhTrangThanhToan}</td>
-        <td class='border p-2'>${order.time}</td>
+        <td class="px-4 py-3">${order.tuVanBH}</td>
+        <td class="px-4 py-3">${order.dongXe}</td>
+        <td class="px-4 py-3">${order.phienBan}</td>
+        <td class="px-4 py-3">${order.ngoaiThat}</td>
+        <td class="px-4 py-3">${order.noiThat}</td>
+        <td class="px-4 py-3">${order.vso}</td>
+        <td class="px-4 py-3">${order.tenKH}</td>
+        <td class="px-4 py-3">${order.ngayCoc}</td>
+        <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
+        <td class="px-4 py-3">${order.time}</td>
       </tr>`;
       $("#orderTable tbody").append(row);
       $("#totalOrders").text(orders.length);
-
       toastr.success("Đơn hàng đã được thêm!");
-
-      // Xoá dữ liệu trong các input sau khi thêm
       $("#orderForm input, #orderForm select").val("");
-
-      // Cuộn xuống bảng nếu cần
       $("html, body").animate({
         scrollTop: $("#orderTable").offset().top
       }, 1000);
     }
 
-    // Thêm chức năng tìm kiếm đơn hàng
     $("#searchInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
       $("#orderTable tbody tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
       });
     });
+
+    function exportToExcel() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('orderTable'), { sheet:"Orders" });
+      XLSX.writeFile(wb, 'DonHang.xlsx');
+    }
   </script>
 </body>
 </html>
