@@ -95,53 +95,67 @@
     </div>
 
     <script>
-        function addOrder() {
-            let formData = {
-                advisor: document.getElementById("advisor").value,
-                carModel: document.getElementById("carModel").value,
-                version: document.getElementById("version").value,
-                exterior: document.getElementById("exterior").value,
-                interior: document.getElementById("interior").value,
-                vso: document.getElementById("vso").value,
-                customerName: document.getElementById("customerName").value,
-                depositDate: document.getElementById("depositDate").value,
-                paymentStatus: document.getElementById("paymentStatus").value
-            };
-            
-fetch("https://script.google.com/macros/s/AKfycbzXeGvcIb00iqf-skR3lOpXHTSivo5oVEC84St_LwG8sOzC5j0ReZT_XdOk9mW9TSzu/exec", { 
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        advisor: document.getElementById("advisor").value,
-        carModel: document.getElementById("carModel").value,
-        version: document.getElementById("version").value,
-        exterior: document.getElementById("exterior").value,
-        interior: document.getElementById("interior").value,
-        vso: document.getElementById("vso").value,
-        customerName: document.getElementById("customerName").value,
-        depositDate: document.getElementById("depositDate").value,
-        paymentStatus: document.getElementById("paymentStatus").value
-    })
-})
-.then(response => response.json())
-.then(data => console.log("Success:", data))
-.catch(error => console.error("Error:", error));
+    function addOrder() {
+        let formData = {
+            advisor: document.getElementById("advisor").value,
+            carModel: document.getElementById("carModel").value,
+            version: document.getElementById("version").value,
+            exterior: document.getElementById("exterior").value,
+            interior: document.getElementById("interior").value,
+            vso: document.getElementById("vso").value,
+            customerName: document.getElementById("customerName").value,
+            depositDate: document.getElementById("depositDate").value,
+            paymentStatus: document.getElementById("paymentStatus").value
+        };
 
-
-        function updateOrderList(formData) {
-            let table = document.querySelector("#orderTable tbody");
-            let row = table.insertRow();
-            Object.values(formData).forEach((data, index) => row.insertCell(index).textContent = data);
-            document.getElementById("orderCount").textContent = table.rows.length;
+        // Kiểm tra dữ liệu trước khi gửi
+        if (!formData.advisor || !formData.carModel || !formData.customerName) {
+            document.getElementById("statusMessage").textContent = "Vui lòng điền đầy đủ thông tin bắt buộc!";
+            return;
         }
 
-        function exportToExcel() {
-            let table = document.getElementById("orderTable");
-            let ws = XLSX.utils.table_to_sheet(table);
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Đơn Hàng");
-            XLSX.writeFile(wb, "DanhSachDonHang.xlsx");
+        fetch("https://script.google.com/macros/s/AKfycbzXeGvcIb00iqf-skR3lOpXHTSivo5oVEC84St_LwG8sOzC5j0ReZT_XdOk9mW9TSzu/exec", { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result === "success") {
+                document.getElementById("statusMessage").textContent = "Thêm đơn hàng thành công!";
+                document.getElementById("statusMessage").classList.remove("text-danger");
+                document.getElementById("statusMessage").classList.add("text-success");
+
+                updateOrderList(formData); // Cập nhật bảng danh sách đơn hàng
+            } else {
+                document.getElementById("statusMessage").textContent = "Lỗi khi gửi dữ liệu!";
+            }
+        })
+        .catch(error => {
+            document.getElementById("statusMessage").textContent = "Lỗi kết nối, vui lòng thử lại!";
+            console.error("Error:", error);
+        });
+    }
+
+    function updateOrderList(formData) {
+        let table = document.querySelector("#orderTable tbody");
+        let row = table.insertRow();
+        Object.values(formData).forEach((data, index) => row.insertCell(index).textContent = data);
+        document.getElementById("orderCount").textContent = table.rows.length;
+    }
+
+    function exportToExcel() {
+        let table = document.getElementById("orderTable");
+        if (table.rows.length <= 1) {
+            alert("Không có dữ liệu để xuất!");
+            return;
         }
-    </script>
+        
+        let ws = XLSX.utils.table_to_sheet(table);
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Đơn Hàng");
+        XLSX.writeFile(wb, "DanhSachDonHang.xlsx");
+    }
+</script>
 </body>
 </html>
