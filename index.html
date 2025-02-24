@@ -174,7 +174,98 @@
       }, 3000);
     });
 
-    function themDonHang() {
+    
+function themDonHang() {
+  let order = {
+    tuVanBH: $("#tuVanBH").val().trim(),
+    dongXe: $("#dongXe").val().trim(),
+    phienBan: $("#phienBan").val().trim(),
+    ngoaiThat: $("#ngoaiThat").val().trim(),
+    noiThat: $("#noiThat").val().trim(),
+    vso: $("#vso").val().trim(),
+    tenKH: $("#tenKH").val().trim(),
+    ngayCoc: $("#ngayCoc").val().trim(),
+    tinhTrangThanhToan: $("#tinhTrangThanhToan").val().trim(),
+    time: new Date().toLocaleString("vi-VN")
+  };
+
+  // Kiểm tra không để trống
+  if (Object.values(order).some(val => val === "")) {
+    Swal.fire("Lỗi!", "Vui lòng nhập đầy đủ thông tin!", "error");
+    return;
+  }
+
+  // Kiểm tra tính hợp lệ của dữ liệu
+  if (!/^[A-Za-zÀ-ỹ\s]+$/.test(order.tenKH)) {
+    Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
+    return;
+  }
+
+  if (new Date(order.ngayCoc) > new Date()) {
+    Swal.fire("Lỗi!", "Ngày cọc không thể là ngày trong tương lai!", "error");
+    return;
+  }
+
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  if (orders.some(o => o.vso === order.vso)) {
+    Swal.fire("Lỗi!", "VSO đã tồn tại!", "error");
+    return;
+  }
+
+  // Xác nhận trước khi gửi dữ liệu
+  Swal.fire({
+    title: "Xác nhận gửi đơn hàng?",
+    text: "Bạn có chắc muốn gửi dữ liệu này lên Google Sheets?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Gửi ngay"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      console.log("Gửi dữ liệu:", order);
+
+      // Gửi dữ liệu lên Google Sheets API
+      $.ajax({
+        url: "https://script.google.com/macros/s/AKfycbyGrvZPLc9q55NgCAyB9rL_b3NtNbsJoXmvoqug113-yen4UoZ1BDLZHIrSosJ4XRLRcA/exec",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(order),
+        success: function(response) {
+          console.log("Phản hồi từ API:", response);
+
+          if (response.status === "success") {
+            toastr.success("Đơn hàng đã được gửi lên Google Sheets!");
+            $("#orderForm input, #orderForm select").val("");
+
+            // Hiển thị đơn hàng mới trên bảng
+            let newRow = `<tr>
+              <td class="px-4 py-3">${order.tuVanBH}</td>
+              <td class="px-4 py-3">${order.dongXe}</td>
+              <td class="px-4 py-3">${order.phienBan}</td>
+              <td class="px-4 py-3">${order.ngoaiThat}</td>
+              <td class="px-4 py-3">${order.noiThat}</td>
+              <td class="px-4 py-3">${order.vso}</td>
+              <td class="px-4 py-3">${order.tenKH}</td>
+              <td class="px-4 py-3">${order.ngayCoc}</td>
+              <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
+              <td class="px-4 py-3">${order.time}</td>
+            </tr>`;
+            $("#orderTable tbody").append(newRow);
+            $("#totalOrders").text(orders.length + 1);
+          } else {
+            Swal.fire("Lỗi!", "Không thể gửi dữ liệu, kiểm tra lại API!", "error");
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error("Lỗi chi tiết:", xhr.responseText);
+          Swal.fire("Lỗi!", `Gửi thất bại: ${xhr.responseText}`, "error");
+        }
+      });
+    }
+  });
+}
+
       let order = {
         tuVanBH: $("#tuVanBH").val().trim(),
         dongXe: $("#dongXe").val().trim(),
