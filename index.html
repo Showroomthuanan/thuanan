@@ -1,340 +1,144 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nhu Cầu Xe Tháng 3 - Showroom Thuận An</title>
-  <!-- Tailwind CSS và các thư viện cần thiết -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script defer src="https://unpkg.com/lucide@latest"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
-  <style>
-    /* Hiệu ứng cho input */
-    .form-input {
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .form-input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-    }
-  </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 shadow-md">
-    <h1 class="text-4xl font-bold text-center text-white">Nhu Cầu Xe Tháng 3 - Showroom Thuận An</h1>
-  </header>
-
-  <!-- Slider hình ảnh động -->
-  <section id="dynamicImages" class="relative overflow-hidden rounded-xl mx-auto my-8 max-w-5xl">
-    <img id="sliderImage" src="https://via.placeholder.com/1200x400?text=Image+1" alt="Dynamic Image" class="w-full h-64 object-cover transition-opacity duration-700 ease-in-out">
-  </section>
-
-  <main class="container mx-auto py-10 px-4">
-    <!-- Phần Form Thêm Đơn Hàng -->
-    <section class="mb-10">
-      <div class="bg-white rounded-xl shadow-xl p-8">
-        <h2 class="text-2xl font-semibold mb-6 text-gray-700 flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-6 h-6"></i> Thêm Đơn Hàng
-        </h2>
-        <form id="orderForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <select class="border border-gray-300 p-3 rounded-lg form-input select2" id="tuVanBH">
-            <option value="">🔹 Chọn Tư Vấn BH</option>
-            <option>Đinh Trọng Nhân</option>
-            <option>Lê Mai Anh</option>
-            <option>Lê Quốc Thịnh</option>
-            <option>Lương Thế Ngọc</option>
-            <option>Nguyễn Dư Thuận</option>
-            <option>Nguyễn Hoàng Phúc</option>
-            <option>Nguyễn Minh Trung</option>
-            <option>Nguyễn Thiện Thảo</option>
-            <option>Nguyễn Văn Giáp</option>
-            <option>Tất Bách Tường</option>
-            <option>Thành Ngọc Vinh</option>
-            <option>Võ Minh Tuấn</option>
-            <option>Vũ Văn Đạt</option>
-            <option>Trần Thị Nguyệt Bạch</option>
-            <option>Lê Nhựt Quang</option>
-            <option>Phạm Trọng Huy</option>
-            <option>Vũ Viết Hải</option>
-            <option>Nguyễn Anh Tuấn</option>
-            <option>Nguyễn Trần Hoàng Thanh</option>
-            <option>Nguyễn Hoàng Thạch</option>
-            <option>Lý Kim Vinh</option>
-            <option>Bùi Anh Tài</option>
-            <option>Vũ Thị Trang</option>
-          </select>
-          <select class="border border-gray-300 p-3 rounded-lg form-input select2" id="dongXe">
-            <option value="">🚘 Chọn Dòng Xe</option>
-            <option>VF3</option>
-            <option>VF5</option>
-            <option>VF6</option>
-            <option>VF7</option>
-            <option>VF8</option>
-            <option>VF9</option>
-          </select>
-          <input type="text" placeholder="🏷️ Phiên Bản" class="border border-gray-300 p-3 rounded-lg form-input" id="phienBan">
-          <input type="text" placeholder="🎨 Ngoại Thất" class="border border-gray-300 p-3 rounded-lg form-input" id="ngoaiThat">
-          <input type="text" placeholder="🛋️ Nội Thất" class="border border-gray-300 p-3 rounded-lg form-input" id="noiThat">
-          <input type="text" placeholder="📌 VSO" class="border border-gray-300 p-3 rounded-lg form-input" id="vso">
-          <input type="text" placeholder="👤 Tên KH" class="border border-gray-300 p-3 rounded-lg form-input" id="tenKH">
-          <input type="date" class="border border-gray-300 p-3 rounded-lg form-input" id="ngayCoc">
-          <input type="text" placeholder="💰 Tình Trạng Thanh Toán" class="border border-gray-300 p-3 rounded-lg form-input" id="tinhTrangThanhToan">
-          <button type="button" class="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-transform transform hover:scale-105" onclick="themDonHang()">
-            <i data-lucide="plus" class="w-5 h-5 inline-block"></i> Thêm Đơn Hàng
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- Phần Hiển Thị Danh Sách Đơn Hàng -->
-    <section>
-      <div class="bg-white rounded-xl shadow-xl p-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-          <h2 class="text-2xl font-semibold text-gray-700 flex items-center gap-2">
-            <i data-lucide="list" class="w-6 h-6"></i> Danh Sách Đơn Hàng (<span id="totalOrders">0</span>)
-          </h2>
-          <div class="mt-4 md:mt-0">
-            <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm đơn hàng..." class="border border-gray-300 p-3 rounded-lg form-input w-full md:w-64">
-          </div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200" id="orderTable">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Tư Vấn BH</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Dòng Xe</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Phiên Bản</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Ngoại Thất</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Nội Thất</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">VSO</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Tên KH</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Ngày Cọc</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Thanh Toán</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Thời Gian Nhập Liệu</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Các dòng dữ liệu đơn hàng sẽ được thêm tại đây -->
-            </tbody>
-          </table>
-        </div>
-        <div class="mt-4">
-          <button class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded" onclick="exportToExcel()">
-            <i data-lucide="download" class="w-5 h-5 inline-block"></i> Xuất Excel
-          </button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Script xử lý chức năng và slider hình ảnh -->
-  <script>
-    $(document).ready(function(){
-      // Khởi tạo Select2
-      $('.select2').select2();
-      
-      // Khởi tạo dữ liệu đơn hàng từ localStorage
-      let orders = JSON.parse(localStorage.getItem("orders")) || [];
-      orders.forEach(order => {
-        let row = `<tr>
-          <td class="px-4 py-3">${order.tuVanBH}</td>
-          <td class="px-4 py-3">${order.dongXe}</td>
-          <td class="px-4 py-3">${order.phienBan}</td>
-          <td class="px-4 py-3">${order.ngoaiThat}</td>
-          <td class="px-4 py-3">${order.noiThat}</td>
-          <td class="px-4 py-3">${order.vso}</td>
-          <td class="px-4 py-3">${order.tenKH}</td>
-          <td class="px-4 py-3">${order.ngayCoc}</td>
-          <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
-          <td class="px-4 py-3">${order.time}</td>
-        </tr>`;
-        $("#orderTable tbody").append(row);
-      });
-      $("#totalOrders").text(orders.length);
-      
-      // Slider hình ảnh động
-      var images = [
-        'https://via.placeholder.com/1200x400?text=Image+1',
-        'https://via.placeholder.com/1200x400?text=Image+2',
-        'https://via.placeholder.com/1200x400?text=Image+3'
-      ];
-      var currentImage = 0;
-      setInterval(function() {
-        currentImage = (currentImage + 1) % images.length;
-        $('#sliderImage').fadeOut(500, function() {
-          $(this).attr('src', images[currentImage]).fadeIn(500);
-        });
-      }, 3000);
-    });
-
-    
-function themDonHang() {
-  let order = {
-    tuVanBH: $("#tuVanBH").val().trim(),
-    dongXe: $("#dongXe").val().trim(),
-    phienBan: $("#phienBan").val().trim(),
-    ngoaiThat: $("#ngoaiThat").val().trim(),
-    noiThat: $("#noiThat").val().trim(),
-    vso: $("#vso").val().trim(),
-    tenKH: $("#tenKH").val().trim(),
-    ngayCoc: $("#ngayCoc").val().trim(),
-    tinhTrangThanhToan: $("#tinhTrangThanhToan").val().trim(),
-    time: new Date().toLocaleString("vi-VN")
-  };
-
-  // Kiểm tra không để trống
-  if (Object.values(order).some(val => val === "")) {
-    Swal.fire("Lỗi!", "Vui lòng nhập đầy đủ thông tin!", "error");
-    return;
-  }
-
-  // Kiểm tra tính hợp lệ của dữ liệu
-  if (!/^[A-Za-zÀ-ỹ\s]+$/.test(order.tenKH)) {
-    Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
-    return;
-  }
-
-  if (new Date(order.ngayCoc) > new Date()) {
-    Swal.fire("Lỗi!", "Ngày cọc không thể là ngày trong tương lai!", "error");
-    return;
-  }
-
-  let orders = JSON.parse(localStorage.getItem("orders")) || [];
-  if (orders.some(o => o.vso === order.vso)) {
-    Swal.fire("Lỗi!", "VSO đã tồn tại!", "error");
-    return;
-  }
-
-  // Xác nhận trước khi gửi dữ liệu
-  Swal.fire({
-    title: "Xác nhận gửi đơn hàng?",
-    text: "Bạn có chắc muốn gửi dữ liệu này lên Google Sheets?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Gửi ngay"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      console.log("Gửi dữ liệu:", order);
-
-      // Gửi dữ liệu lên Google Sheets API
-      $.ajax({
-        url: "https://script.google.com/macros/s/AKfycbyGrvZPLc9q55NgCAyB9rL_b3NtNbsJoXmvoqug113-yen4UoZ1BDLZHIrSosJ4XRLRcA/exec",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(order),
-        success: function(response) {
-          console.log("Phản hồi từ API:", response);
-
-          if (response.status === "success") {
-            toastr.success("Đơn hàng đã được gửi lên Google Sheets!");
-            $("#orderForm input, #orderForm select").val("");
-
-            // Hiển thị đơn hàng mới trên bảng
-            let newRow = `<tr>
-              <td class="px-4 py-3">${order.tuVanBH}</td>
-              <td class="px-4 py-3">${order.dongXe}</td>
-              <td class="px-4 py-3">${order.phienBan}</td>
-              <td class="px-4 py-3">${order.ngoaiThat}</td>
-              <td class="px-4 py-3">${order.noiThat}</td>
-              <td class="px-4 py-3">${order.vso}</td>
-              <td class="px-4 py-3">${order.tenKH}</td>
-              <td class="px-4 py-3">${order.ngayCoc}</td>
-              <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
-              <td class="px-4 py-3">${order.time}</td>
-            </tr>`;
-            $("#orderTable tbody").append(newRow);
-            $("#totalOrders").text(orders.length + 1);
-          } else {
-            Swal.fire("Lỗi!", "Không thể gửi dữ liệu, kiểm tra lại API!", "error");
-          }
-        },
-        error: function(xhr, status, error) {
-          console.error("Lỗi chi tiết:", xhr.responseText);
-          Swal.fire("Lỗi!", `Gửi thất bại: ${xhr.responseText}`, "error");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đơn Hàng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
         }
-      });
-    }
-  });
-}
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Thêm Đơn Hàng</h2>
+        <form id="orderForm" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Chọn Tư Vấn BH</label>
+                <select class="form-select" id="advisor" required>
+                    <option selected disabled>Chọn Tư Vấn BH</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Chọn Dòng Xe</label>
+                <select class="form-select" id="carModel" required>
+                    <option selected disabled>Chọn Dòng Xe</option>
+                    <option value="VF8">VF8</option>
+                    <option value="VF9">VF9</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Phiên Bản</label>
+                <input type="text" class="form-control" id="version">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ngoại Thất</label>
+                <input type="text" class="form-control" id="exterior">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Nội Thất</label>
+                <input type="text" class="form-control" id="interior">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">VSO</label>
+                <input type="text" class="form-control" id="vso">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tên KH</label>
+                <input type="text" class="form-control" id="customerName" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ngày Cọc</label>
+                <input type="date" class="form-control" id="depositDate">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tình Trạng Thanh Toán</label>
+                <input type="text" class="form-control" id="paymentStatus">
+            </div>
+            <div class="col-12">
+                <button type="button" class="btn btn-primary w-100" onclick="addOrder()">Thêm Đơn Hàng</button>
+            </div>
+        </form>
+    </div>
+    <div class="container mt-4">
+        <h4>Danh Sách Đơn Hàng (<span id="orderCount">0</span>)</h4>
+        <table class="table table-bordered mt-3" id="orderTable">
+            <thead>
+                <tr>
+                    <th>Tư Vấn BH</th>
+                    <th>Dòng Xe</th>
+                    <th>Phiên Bản</th>
+                    <th>Ngoại Thất</th>
+                    <th>Nội Thất</th>
+                    <th>VSO</th>
+                    <th>Tên KH</th>
+                    <th>Ngày Cọc</th>
+                    <th>Thanh Toán</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button class="btn btn-success" onclick="exportToExcel()">Xuất Excel</button>
+    </div>
 
-      let order = {
-        tuVanBH: $("#tuVanBH").val().trim(),
-        dongXe: $("#dongXe").val().trim(),
-        phienBan: $("#phienBan").val().trim(),
-        ngoaiThat: $("#ngoaiThat").val().trim(),
-        noiThat: $("#noiThat").val().trim(),
-        vso: $("#vso").val().trim(),
-        tenKH: $("#tenKH").val().trim(),
-        ngayCoc: $("#ngayCoc").val().trim(),
-        tinhTrangThanhToan: $("#tinhTrangThanhToan").val().trim(),
-        time: new Date().toLocaleString('vi-VN')
-      };
+    <script>
+        function addOrder() {
+            let formData = {
+                advisor: document.getElementById("advisor").value,
+                carModel: document.getElementById("carModel").value,
+                version: document.getElementById("version").value,
+                exterior: document.getElementById("exterior").value,
+                interior: document.getElementById("interior").value,
+                vso: document.getElementById("vso").value,
+                customerName: document.getElementById("customerName").value,
+                depositDate: document.getElementById("depositDate").value,
+                paymentStatus: document.getElementById("paymentStatus").value
+            };
 
-      let orders = JSON.parse(localStorage.getItem("orders")) || [];
-      if(Object.values(order).some(val => val === "")) {
-        Swal.fire("Lỗi!", "Vui lòng nhập đầy đủ thông tin!", "error");
-        return;
-      }
+            fetch("https://script.google.com/macros/s/AKfycbyGrvZPLc9q55NgCAyB9rL_b3NtNbsJoXmvoqug113-yen4UoZ1BDLZHIrSosJ4XRLRcA/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "success") {
+                    alert("Dữ liệu đã được gửi lên Google Sheets thành công!");
+                    document.getElementById("orderForm").reset();
+                    updateOrderList(formData);
+                } else {
+                    alert("Lỗi khi thêm đơn hàng: " + data.message);
+                }
+            })
+            .catch(error => alert("Lỗi kết nối: " + error.message));
+        }
 
-      if(!/^[\p{L}\s]+$/u.test(order.tenKH)) {
-        Swal.fire("Lỗi!", "Tên khách hàng chỉ được phép nhập chữ!", "error");
-        return;
-      }
+        function updateOrderList(formData) {
+            let table = document.querySelector("#orderTable tbody");
+            let row = table.insertRow();
+            Object.values(formData).forEach((data, index) => row.insertCell(index).textContent = data);
+            document.getElementById("orderCount").textContent = table.rows.length;
+        }
 
-      if(new Date(order.ngayCoc) > new Date()){
-        Swal.fire("Lỗi!", "Ngày cọc không thể là ngày trong tương lai!", "error");
-        return;
-      }
-
-      if(orders.some(o => o.vso === order.vso)) {
-        Swal.fire("Lỗi!", "VSO đã tồn tại!", "error");
-        return;
-      }
-
-      orders.push(order);
-      localStorage.setItem("orders", JSON.stringify(orders));
-
-      let row = `<tr>
-        <td class="px-4 py-3">${order.tuVanBH}</td>
-        <td class="px-4 py-3">${order.dongXe}</td>
-        <td class="px-4 py-3">${order.phienBan}</td>
-        <td class="px-4 py-3">${order.ngoaiThat}</td>
-        <td class="px-4 py-3">${order.noiThat}</td>
-        <td class="px-4 py-3">${order.vso}</td>
-        <td class="px-4 py-3">${order.tenKH}</td>
-        <td class="px-4 py-3">${order.ngayCoc}</td>
-        <td class="px-4 py-3">${order.tinhTrangThanhToan}</td>
-        <td class="px-4 py-3">${order.time}</td>
-      </tr>`;
-      $("#orderTable tbody").append(row);
-      $("#totalOrders").text(orders.length);
-      toastr.success("Đơn hàng đã được thêm!");
-      $("#orderForm input, #orderForm select").val("");
-      $("html, body").animate({
-        scrollTop: $("#orderTable").offset().top
-      }, 1000);
-    }
-
-    $("#searchInput").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      $("#orderTable tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-      });
-    });
-
-    function exportToExcel() {
-      var wb = XLSX.utils.table_to_book(document.getElementById('orderTable'), { sheet:"Orders" });
-      XLSX.writeFile(wb, 'DonHang.xlsx');
-    }
-  </script>
+        function exportToExcel() {
+            let table = document.getElementById("orderTable");
+            let ws = XLSX.utils.table_to_sheet(table);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Đơn Hàng");
+            XLSX.writeFile(wb, "DanhSachDonHang.xlsx");
+        }
+    </script>
 </body>
 </html>
