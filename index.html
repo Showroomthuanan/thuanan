@@ -85,7 +85,7 @@
             
             $.post(API_URL, data, function(response) {
                 alert(response.message);
-                addRowToTable(data);
+                fetchData(); // Load lại danh sách sau khi thêm
             }, 'json');
             
             $('#carForm')[0].reset();
@@ -110,7 +110,7 @@
         function deleteRow(orderNumber) {
             $.post(API_URL, { action: 'delete', orderNumber: orderNumber }, function(response) {
                 alert(response.message);
-                $(`#row-${orderNumber}`).remove();
+                fetchData(); // Load lại danh sách sau khi xóa
             }, 'json');
         }
 
