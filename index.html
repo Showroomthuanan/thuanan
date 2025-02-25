@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
                 <div class="col-md-3">
-                    <button type="button" class="btn btn-primary" onclick="submitCarRequest()" id="submitBtn">
+                    <button type="button" class="btn btn-primary" id="submitBtn">
                         <i class="fa-solid fa-plus"></i> Thêm yêu cầu
                     </button>
                 </div>
@@ -63,7 +63,7 @@
                     <th>Hành động</th>
                 </tr>
             </thead>
-            <tbody id="carList"></tbody>
+            <tbody></tbody>
         </table>
     </div>
     <script>
@@ -73,6 +73,7 @@
             $('.loading').show();
             $.get(API_URL, { action: 'get' }, function(response) {
                 $('.loading').hide();
+                console.log("API Response:", response);
                 if (response.data) {
                     renderTable(response.data);
                 }
@@ -80,11 +81,8 @@
         }
 
         function submitCarRequest() {
-            let index = $('#editIndex').val();
-            let action = index ? 'update' : 'add';
             let data = {
-                action,
-                index,
+                action: 'add',
                 seller: $('#seller').val(),
                 carModel: $('#carModel').val(),
                 version: $('#version').val(),
@@ -96,13 +94,10 @@
                 paymentStatus: $('#paymentStatus').val()
             };
 
-            $('#submitBtn').prop('disabled', true);
             $.post(API_URL, data, function(response) {
-                $('#submitBtn').prop('disabled', false);
                 alert(response.message);
                 fetchData();
                 $('#carForm')[0].reset();
-                $('#editIndex').val('');
             }, 'json');
         }
 
@@ -118,22 +113,10 @@
             });
         }
 
-        function editCar(index) {
-            let data = JSON.parse(localStorage.getItem('carList'))[index];
-            Object.keys(data).forEach(key => $('#' + key).val(data[key]));
-            $('#editIndex').val(index);
-        }
-
-        function deleteCar(index) {
-            $.post(API_URL, { action: 'delete', index }, function(response) {
-                alert(response.message);
-                fetchData();
-            }, 'json');
-        }
-
         $(document).ready(function() {
             $('#carTable').DataTable();
             fetchData();
+            $('#submitBtn').on('click', submitCarRequest);
         });
     </script>
 </body>
