@@ -3,159 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Đơn Hàng</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Quản lý Ghép Xe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
     <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+        body { background-color: #f8f9fa; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); }
+        h2 { text-align: center; margin-bottom: 20px; font-weight: bold; color: #007bff; }
+        table { background: white; }
+        th { background-color: #007bff; color: white; }
+        .input-group-text { background-color: #007bff; color: white; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="mb-4">Thêm Đơn Hàng</h2>
-        <form id="orderForm" class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Chọn Tư Vấn BH</label>
-                <select class="form-select" id="advisor" required>
-                    <option selected disabled>Chọn Tư Vấn BH</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Chọn Dòng Xe</label>
-                <select class="form-select" id="carModel" required>
-                    <option selected disabled>Chọn Dòng Xe</option>
-                    <option value="VF8">VF8</option>
-                    <option value="VF9">VF9</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Phiên Bản</label>
-                <input type="text" class="form-control" id="version">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Ngoại Thất</label>
-                <input type="text" class="form-control" id="exterior">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Nội Thất</label>
-                <input type="text" class="form-control" id="interior">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">VSO</label>
-                <input type="text" class="form-control" id="vso">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Tên KH</label>
-                <input type="text" class="form-control" id="customerName" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Ngày Cọc</label>
-                <input type="date" class="form-control" id="depositDate">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Tình Trạng Thanh Toán</label>
-                <input type="text" class="form-control" id="paymentStatus">
-            </div>
-            <div class="col-12">
-                <button type="button" class="btn btn-primary w-100" onclick="addOrder()">Thêm Đơn Hàng</button>
+    <div class="container mt-5">
+        <h2><i class="fa-solid fa-car"></i> Quản lý các yêu cầu ghép xe</h2>
+        <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Tìm kiếm theo tên bán hàng, số đơn hàng hoặc tên khách hàng">
+        <form id="carForm" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tên bán hàng" id="seller"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🛋️ Nội thất" id="interior"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🆔 Số đơn hàng" id="orderNumber"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="👤 Tên khách hàng" id="customer"></div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                        <input type="date" class="form-control" id="depositDate">
+                    </div>
+                </div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-primary" onclick="addCarRequest()"><i class="fa-solid fa-plus"></i> Thêm yêu cầu</button>
+                    <button type="button" class="btn btn-success" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+                </div>
             </div>
         </form>
-        <p id="statusMessage" class="mt-3 text-danger"></p>
-    </div>
-    <div class="container mt-4">
-        <h4>Danh Sách Đơn Hàng (<span id="orderCount">0</span>)</h4>
-        <table class="table table-bordered mt-3" id="orderTable">
+        <table class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th>Tư Vấn BH</th>
-                    <th>Dòng Xe</th>
-                    <th>Phiên Bản</th>
-                    <th>Ngoại Thất</th>
-                    <th>Nội Thất</th>
-                    <th>VSO</th>
-                    <th>Tên KH</th>
-                    <th>Ngày Cọc</th>
-                    <th>Thanh Toán</th>
+                    <th>Tên bán hàng</th>
+                    <th> Dòng xe</th>
+                    <th> Phiên bản</th>
+                    <th> Ngoại thất</th>
+                    <th> Nội thất</th>
+                    <th> Số đơn hàng</th>
+                    <th> Tên khách hàng</th>
+                    <th> Ngày cọc</th>
+                    <th> Tình trạng thanh toán</th>
+                    <th> Hành động</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="carList"></tbody>
         </table>
-        <button class="btn btn-success" onclick="exportToExcel()">Xuất Excel</button>
     </div>
-
     <script>
-    function addOrder() {
-        let formData = {
-            advisor: document.getElementById("advisor").value,
-            carModel: document.getElementById("carModel").value,
-            version: document.getElementById("version").value,
-            exterior: document.getElementById("exterior").value,
-            interior: document.getElementById("interior").value,
-            vso: document.getElementById("vso").value,
-            customerName: document.getElementById("customerName").value,
-            depositDate: document.getElementById("depositDate").value,
-            paymentStatus: document.getElementById("paymentStatus").value
-        };
+        const SHEET_ID = '1Ks92wQ5gxx-RKOy3TXE96lCrc5Nz85pS1_hiI00pYlY';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwd8RxfbW6EOfRc9DTxxVIW0FLxKMpvlkeQe0QWlQ8R3VlkV9iUROtbggmPnZ97Dc6Hlw/exec';
 
-        // Kiểm tra dữ liệu trước khi gửi
-        if (!formData.advisor || !formData.carModel || !formData.customerName) {
-            document.getElementById("statusMessage").textContent = "Vui lòng điền đầy đủ thông tin bắt buộc!";
-            return;
-        }
-
-        fetch("https://script.google.com/macros/s/AKfycbx36X7jCGPalSTsfv9rF-sh7peDMq29wodogHAJfRwL9olxeoCCkH4WtIpMZSwr0dYe/exec", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === "success") {
-                document.getElementById("statusMessage").textContent = "Thêm đơn hàng thành công!";
-                document.getElementById("statusMessage").classList.remove("text-danger");
-                document.getElementById("statusMessage").classList.add("text-success");
-
-                updateOrderList(formData); // Cập nhật bảng danh sách đơn hàng
-            } else {
-                document.getElementById("statusMessage").textContent = "Lỗi khi gửi dữ liệu!";
-            }
-        })
-        .catch(error => {
-            document.getElementById("statusMessage").textContent = "Lỗi kết nối, vui lòng thử lại!";
-            console.error("Error:", error);
+        $(document).ready(function () {
+            loadFromGoogleSheet();
+            $('#search').on('keyup', function () {
+                let value = $(this).val().toLowerCase();
+                $('#carList tr').filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
         });
-    }
 
-    function updateOrderList(formData) {
-        let table = document.querySelector("#orderTable tbody");
-        let row = table.insertRow();
-        Object.values(formData).forEach((data, index) => row.insertCell(index).textContent = data);
-        document.getElementById("orderCount").textContent = table.rows.length;
-    }
-
-    function exportToExcel() {
-        let table = document.getElementById("orderTable");
-        if (table.rows.length <= 1) {
-            alert("Không có dữ liệu để xuất!");
-            return;
+        function addCarRequest() {
+            let data = {
+                action: 'add',
+                seller: $('#seller').val(),
+                carModel: $('#carModel').val(),
+                version: $('#version').val(),
+                exterior: $('#exterior').val(),
+                interior: $('#interior').val(),
+                orderNumber: $('#orderNumber').val(),
+                customer: $('#customer').val(),
+                depositDate: $('#depositDate').val(),
+                paymentStatus: $('#paymentStatus').val()
+            };
+            $.post(API_URL, data, function (response) {
+                alert(response.message);
+                loadFromGoogleSheet();
+            }, 'json');
+            $('#carForm')[0].reset();
         }
-        
-        let ws = XLSX.utils.table_to_sheet(table);
-        let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Đơn Hàng");
-        XLSX.writeFile(wb, "DanhSachDonHang.xlsx");
-    }
-</script>
+    </script>
 </body>
 </html>
