@@ -6,8 +6,10 @@
     <title>Quản lý Ghép Xe</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <style>
         body { background-color: #f8f9fa; }
         .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); }
@@ -41,7 +43,7 @@
                 </div>
             </div>
         </form>
-        <table class="table table-bordered text-center">
+        <table id="carTable" class="table table-bordered text-center">
             <thead>
                 <tr>
                     <th>Tư vấn bán hàng</th>
@@ -53,13 +55,14 @@
                     <th>Tên khách hàng</th>
                     <th>Ngày cọc</th>
                     <th>Tình trạng thanh toán</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="carList"></tbody>
         </table>
     </div>
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwd8RxfbW6EOfRc9DTxxVIW0FLxKMpvlkeQe0QWlQ8R3VlkV9iUROtbggmPnZ97Dc6Hlw/exec';
+        const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
         function fetchData() {
             $.get(API_URL, { action: 'get' }, function(response) {
@@ -86,10 +89,7 @@
             
             $.post(API_URL, data, function(response) {
                 if (response.success) {
-                    let storedData = JSON.parse(localStorage.getItem('carList')) || [];
-                    storedData.push(data);
-                    localStorage.setItem('carList', JSON.stringify(storedData));
-                    renderTable(storedData);
+                    fetchData();
                 }
                 alert(response.message);
             }, 'json');
@@ -98,29 +98,31 @@
         }
 
         function renderTable(data) {
-            $('#carList').empty();
-            data.forEach(row => {
-                $('#carList').append(`
-                    <tr>
-                        <td>${row.seller}</td>
-                        <td>${row.carModel}</td>
-                        <td>${row.version}</td>
-                        <td>${row.exterior}</td>
-                        <td>${row.interior}</td>
-                        <td>${row.orderNumber}</td>
-                        <td>${row.customer}</td>
-                        <td>${row.depositDate}</td>
-                        <td>${row.paymentStatus}</td>
-                    </tr>
-                `);
+            let table = $('#carTable').DataTable();
+            table.clear();
+            data.forEach((row, index) => {
+                table.row.add([
+                    row.seller, row.carModel, row.version, row.exterior, row.interior, row.orderNumber, row.customer, row.depositDate, row.paymentStatus,
+                    `<button class='btn btn-warning btn-sm' onclick='editCar(${index})'>✏️</button>
+                     <button class='btn btn-danger btn-sm' onclick='deleteCar(${index})'>🗑️</button>`
+                ]).draw(false);
             });
         }
 
+        function editCar(index) {
+            let data = JSON.parse(localStorage.getItem('carList'))[index];
+            Object.keys(data).forEach(key => $('#' + key).val(data[key]));
+        }
+
+        function deleteCar(index) {
+            let data = JSON.parse(localStorage.getItem('carList'));
+            data.splice(index, 1);
+            localStorage.setItem('carList', JSON.stringify(data));
+            fetchData();
+        }
+
         $(document).ready(function() {
-            let storedData = JSON.parse(localStorage.getItem('carList'));
-            if (storedData) {
-                renderTable(storedData);
-            }
+            $('#carTable').DataTable();
             fetchData();
         });
     </script>
