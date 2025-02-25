@@ -70,22 +70,29 @@
         }
 
         function addCarRequest() {
+            let seller = $('#seller').val();
+            let carModel = $('#carModel').val();
+            let orderNumber = $('#orderNumber').val();
+            
+            if (!seller || !carModel || !orderNumber) {
+                alert("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+            
             let data = {
                 action: 'add',
-                seller: $('#seller').val(),
-                carModel: $('#carModel').val(),
+                seller, carModel,
                 version: $('#version').val(),
                 exterior: $('#exterior').val(),
                 interior: $('#interior').val(),
-                orderNumber: $('#orderNumber').val(),
-                customer: $('#customer').val(),
+                orderNumber, customer: $('#customer').val(),
                 depositDate: $('#depositDate').val(),
                 paymentStatus: $('#paymentStatus').val()
             };
             
             $.post(API_URL, data, function(response) {
                 alert(response.message);
-                fetchData(); // Load lại danh sách sau khi thêm
+                addRowToTable(data);
             }, 'json');
             
             $('#carForm')[0].reset();
@@ -108,15 +115,16 @@
         }
 
         function deleteRow(orderNumber) {
+            if (!confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) return;
             $.post(API_URL, { action: 'delete', orderNumber: orderNumber }, function(response) {
                 alert(response.message);
-                fetchData(); // Load lại danh sách sau khi xóa
-            }, 'json');
+                $(`#row-${orderNumber}`).remove();
+            }, 'json').fail(function() {
+                alert("Lỗi kết nối API, vui lòng kiểm tra lại!");
+            });
         }
 
-        $(document).ready(function () {
-            fetchData();
-        });
+        $(document).ready(fetchData);
     </script>
 </body>
 </html>
