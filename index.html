@@ -17,13 +17,16 @@
         table { background: white; }
         th { background-color: #007bff; color: white; }
         .input-group-text { background-color: #007bff; color: white; }
+        .loading { display: none; text-align: center; color: #007bff; }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
+        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
         <form id="carForm" class="mb-4">
             <div class="row g-3">
+                <input type="hidden" id="editIndex">
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
@@ -39,7 +42,9 @@
                 </div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
                 <div class="col-md-3">
-                    <button type="button" class="btn btn-primary" onclick="addCarRequest()"><i class="fa-solid fa-plus"></i> Thêm yêu cầu</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCarRequest()" id="submitBtn">
+                        <i class="fa-solid fa-plus"></i> Thêm yêu cầu
+                    </button>
                 </div>
             </div>
         </form>
@@ -65,17 +70,21 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbwd8RxfbW6EOfRc9DTxxVIW0FLxKMpvlkeQe0QWlQ8R3VlkV9iUROtbggmPnZ97Dc6Hlw/exec';
 
         function fetchData() {
+            $('.loading').show();
             $.get(API_URL, { action: 'get' }, function(response) {
+                $('.loading').hide();
                 if (response.data) {
-                    localStorage.setItem('carList', JSON.stringify(response.data));
                     renderTable(response.data);
                 }
             }, 'json');
         }
 
-        function addCarRequest() {
+        function submitCarRequest() {
+            let index = $('#editIndex').val();
+            let action = index ? 'update' : 'add';
             let data = {
-                action: 'add',
+                action,
+                index,
                 seller: $('#seller').val(),
                 carModel: $('#carModel').val(),
                 version: $('#version').val(),
@@ -86,15 +95,15 @@
                 depositDate: $('#depositDate').val(),
                 paymentStatus: $('#paymentStatus').val()
             };
-            
+
+            $('#submitBtn').prop('disabled', true);
             $.post(API_URL, data, function(response) {
-                if (response.success) {
-                    fetchData();
-                }
+                $('#submitBtn').prop('disabled', false);
                 alert(response.message);
+                fetchData();
+                $('#carForm')[0].reset();
+                $('#editIndex').val('');
             }, 'json');
-            
-            $('#carForm')[0].reset();
         }
 
         function renderTable(data) {
@@ -112,13 +121,14 @@
         function editCar(index) {
             let data = JSON.parse(localStorage.getItem('carList'))[index];
             Object.keys(data).forEach(key => $('#' + key).val(data[key]));
+            $('#editIndex').val(index);
         }
 
         function deleteCar(index) {
-            let data = JSON.parse(localStorage.getItem('carList'));
-            data.splice(index, 1);
-            localStorage.setItem('carList', JSON.stringify(data));
-            fetchData();
+            $.post(API_URL, { action: 'delete', index }, function(response) {
+                alert(response.message);
+                fetchData();
+            }, 'json');
         }
 
         $(document).ready(function() {
