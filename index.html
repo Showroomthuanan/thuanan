@@ -19,10 +19,10 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
+        <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
         <form id="carForm" class="mb-4">
             <div class="row g-3">
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
@@ -44,7 +44,7 @@
         <table class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th>Tư vấn bán hàng</th>
+                    <th>Tư vấn bán hàng</th>
                     <th>Dòng xe</th>
                     <th>Phiên bản</th>
                     <th>Ngoại thất</th>
@@ -53,7 +53,6 @@
                     <th>Tên khách hàng</th>
                     <th>Ngày cọc</th>
                     <th>Tình trạng thanh toán</th>
-                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="carList"></tbody>
@@ -64,8 +63,10 @@
 
         function fetchData() {
             $.get(API_URL, { action: 'get' }, function(response) {
-                $('#carList').empty();
-                response.data.forEach(addRowToTable);
+                if (response.data) {
+                    localStorage.setItem('carList', JSON.stringify(response.data));
+                    renderTable(response.data);
+                }
             }, 'json');
         }
 
@@ -84,14 +85,44 @@
             };
             
             $.post(API_URL, data, function(response) {
+                if (response.success) {
+                    let storedData = JSON.parse(localStorage.getItem('carList')) || [];
+                    storedData.push(data);
+                    localStorage.setItem('carList', JSON.stringify(storedData));
+                    renderTable(storedData);
+                }
                 alert(response.message);
-                addRowToTable(data);
             }, 'json');
             
             $('#carForm')[0].reset();
         }
 
-        $(document).ready(fetchData);
+        function renderTable(data) {
+            $('#carList').empty();
+            data.forEach(row => {
+                $('#carList').append(`
+                    <tr>
+                        <td>${row.seller}</td>
+                        <td>${row.carModel}</td>
+                        <td>${row.version}</td>
+                        <td>${row.exterior}</td>
+                        <td>${row.interior}</td>
+                        <td>${row.orderNumber}</td>
+                        <td>${row.customer}</td>
+                        <td>${row.depositDate}</td>
+                        <td>${row.paymentStatus}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        $(document).ready(function() {
+            let storedData = JSON.parse(localStorage.getItem('carList'));
+            if (storedData) {
+                renderTable(storedData);
+            }
+            fetchData();
+        });
     </script>
 </body>
 </html>
