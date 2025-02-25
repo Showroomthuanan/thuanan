@@ -19,10 +19,10 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2><i class="fa-solid fa-car"></i> Quản lý các yêu cầu ghép xe</h2>
+        <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
         <form id="carForm" class="mb-4">
             <div class="row g-3">
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tên bán hàng" id="seller"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
@@ -44,7 +44,7 @@
         <table class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th>Tên bán hàng</th>
+                    <th>Tư vấn bán hàng</th>
                     <th>Dòng xe</th>
                     <th>Phiên bản</th>
                     <th>Ngoại thất</th>
@@ -70,22 +70,15 @@
         }
 
         function addCarRequest() {
-            let seller = $('#seller').val();
-            let carModel = $('#carModel').val();
-            let orderNumber = $('#orderNumber').val();
-            
-            if (!seller || !carModel || !orderNumber) {
-                alert("Vui lòng nhập đầy đủ thông tin!");
-                return;
-            }
-            
             let data = {
                 action: 'add',
-                seller, carModel,
+                seller: $('#seller').val(),
+                carModel: $('#carModel').val(),
                 version: $('#version').val(),
                 exterior: $('#exterior').val(),
                 interior: $('#interior').val(),
-                orderNumber, customer: $('#customer').val(),
+                orderNumber: $('#orderNumber').val(),
+                customer: $('#customer').val(),
                 depositDate: $('#depositDate').val(),
                 paymentStatus: $('#paymentStatus').val()
             };
@@ -96,32 +89,6 @@
             }, 'json');
             
             $('#carForm')[0].reset();
-        }
-
-        function addRowToTable(data) {
-            let newRow = `<tr id="row-${data.orderNumber}">
-                <td>${data.seller}</td>
-                <td>${data.carModel}</td>
-                <td>${data.version}</td>
-                <td>${data.exterior}</td>
-                <td>${data.interior}</td>
-                <td>${data.orderNumber}</td>
-                <td>${data.customer}</td>
-                <td>${data.depositDate}</td>
-                <td>${data.paymentStatus}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteRow('${data.orderNumber}')"><i class="fa-solid fa-trash"></i></button></td>
-            </tr>`;
-            $('#carList').append(newRow);
-        }
-
-        function deleteRow(orderNumber) {
-            if (!confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) return;
-            $.post(API_URL, { action: 'delete', orderNumber: orderNumber }, function(response) {
-                alert(response.message);
-                $(`#row-${orderNumber}`).remove();
-            }, 'json').fail(function() {
-                alert("Lỗi kết nối API, vui lòng kiểm tra lại!");
-            });
         }
 
         $(document).ready(fetchData);
