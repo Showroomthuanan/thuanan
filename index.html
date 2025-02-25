@@ -39,7 +39,6 @@
                 <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
                 <div class="col-md-3">
                     <button type="button" class="btn btn-primary" onclick="addCarRequest()"><i class="fa-solid fa-plus"></i> Thêm yêu cầu</button>
-                    <button type="button" class="btn btn-success" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
                 </div>
             </div>
         </form>
@@ -47,33 +46,22 @@
             <thead>
                 <tr>
                     <th>Tên bán hàng</th>
-                    <th> Dòng xe</th>
-                    <th> Phiên bản</th>
-                    <th> Ngoại thất</th>
-                    <th> Nội thất</th>
-                    <th> Số đơn hàng</th>
-                    <th> Tên khách hàng</th>
-                    <th> Ngày cọc</th>
-                    <th> Tình trạng thanh toán</th>
-                    <th> Hành động</th>
+                    <th>Dòng xe</th>
+                    <th>Phiên bản</th>
+                    <th>Ngoại thất</th>
+                    <th>Nội thất</th>
+                    <th>Số đơn hàng</th>
+                    <th>Tên khách hàng</th>
+                    <th>Ngày cọc</th>
+                    <th>Tình trạng thanh toán</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="carList"></tbody>
         </table>
     </div>
     <script>
-        const SHEET_ID = '1Ks92wQ5gxx-RKOy3TXE96lCrc5Nz85pS1_hiI00pYlY';
         const API_URL = 'https://script.google.com/macros/s/AKfycbwd8RxfbW6EOfRc9DTxxVIW0FLxKMpvlkeQe0QWlQ8R3VlkV9iUROtbggmPnZ97Dc6Hlw/exec';
-
-        $(document).ready(function () {
-            loadFromGoogleSheet();
-            $('#search').on('keyup', function () {
-                let value = $(this).val().toLowerCase();
-                $('#carList tr').filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                });
-            });
-        });
 
         function addCarRequest() {
             let data = {
@@ -88,11 +76,33 @@
                 depositDate: $('#depositDate').val(),
                 paymentStatus: $('#paymentStatus').val()
             };
-            $.post(API_URL, data, function (response) {
+            
+            $.post(API_URL, data, function(response) {
                 alert(response.message);
-                loadFromGoogleSheet();
+                addRowToTable(data);
             }, 'json');
+            
             $('#carForm')[0].reset();
+        }
+
+        function addRowToTable(data) {
+            let newRow = `<tr>
+                <td>${data.seller}</td>
+                <td>${data.carModel}</td>
+                <td>${data.version}</td>
+                <td>${data.exterior}</td>
+                <td>${data.interior}</td>
+                <td>${data.orderNumber}</td>
+                <td>${data.customer}</td>
+                <td>${data.depositDate}</td>
+                <td>${data.paymentStatus}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>`;
+            $('#carList').append(newRow);
+        }
+        
+        function deleteRow(button) {
+            $(button).closest('tr').remove();
         }
     </script>
 </body>
