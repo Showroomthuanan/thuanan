@@ -3,121 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Ghép Xe</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <title>Danh Sách Đơn Hàng Đã Ghép Xe</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body { background-color: #f8f9fa; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); }
-        h2 { text-align: center; margin-bottom: 20px; font-weight: bold; color: #007bff; }
-        table { background: white; }
-        th { background-color: #007bff; color: white; }
-        .input-group-text { background-color: #007bff; color: white; }
-        .loading { display: none; text-align: center; color: #007bff; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1e1e1e;
+            color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .table th:hover {
+            background-color: #0056b3;
+        }
+        .btn-refresh {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            background: #343a40;
+            color: #fff;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        input.form-control {
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+        }
+        input.form-control::placeholder {
+            color: #bbb;
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
-        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
-        <form id="carForm" class="mb-4">
-            <div class="row g-3">
-                <input type="hidden" id="editIndex">
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🛋️ Nội thất" id="interior"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="🆔 Số đơn hàng" id="orderNumber"></div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="👤 Tên khách hàng" id="customer"></div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                        <input type="date" class="form-control" id="depositDate">
-                    </div>
-                </div>
-                <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
-                <div class="col-md-3">
-                    <button type="button" class="btn btn-primary" id="submitBtn">
-                        <i class="fa-solid fa-plus"></i> Thêm yêu cầu
-                    </button>
-                </div>
+    <div class="container">
+        <div class="header">Danh Sách Đơn Hàng Đã Ghép Xe</div>
+        <div class="d-flex justify-content-between mb-3">
+            <div class="search-box">
+                <input type="text" id="search-keyword" class="form-control" placeholder="Nhập từ khóa..." oninput="applyFilters()">
             </div>
-        </form>
-        <table id="carTable" class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <th>Tư vấn bán hàng</th>
-                    <th>Dòng xe</th>
-                    <th>Phiên bản</th>
-                    <th>Ngoại thất</th>
-                    <th>Nội thất</th>
-                    <th>Số đơn hàng</th>
-                    <th>Tên khách hàng</th>
-                    <th>Ngày cọc</th>
-                    <th>Tình trạng thanh toán</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+            <button class="btn btn-outline-primary btn-refresh" onclick="fetchData()">
+                🔄 Tải lại
+            </button>
+        </div>
+        <p id="data-count" class="text-muted">Đang tải dữ liệu...</p>
+        <div class="table-responsive">
+            <table class="table table-dark table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Số TT</th>
+                        <th onclick="sortTable(1)">Tư Vấn BH</th>
+                        <th onclick="sortTable(2)">Dòng Xe</th>
+                        <th onclick="sortTable(3)">Phiên Bản</th>
+                        <th onclick="sortTable(4)">Ngoại Thất</th>
+                        <th onclick="sortTable(5)">Nội Thất</th>
+                        <th onclick="sortTable(6)">VSO</th>
+                        <th onclick="sortTable(7)">Tên Khách Hàng</th>
+                        <th onclick="sortTable(8)">Số Vin</th>
+                        <th onclick="sortTable(9)">Ngày Ghép</th>
+                        <th onclick="sortTable(10)">Số Ngày</th>
+                        <th onclick="sortTable(11)">Vị Trí Xe</th>
+                        <th onclick="sortTable(12)">Ghi Chú</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table">
+                    <tr><td colspan="13" class="text-center">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+    
     <script>
-        const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        let rawData = [];
+        let sortDirection = 1;
 
-        function fetchData() {
-            $('.loading').show();
-            $.get(API_URL, { action: 'get' }, function(response) {
-                $('.loading').hide();
-                console.log("API Response:", response);
-                if (response.data) {
-                    $('#carTable').DataTable().clear().destroy();
-                    renderTable(response.data);
-                }
-            }, 'json');
+        async function fetchData() {
+            const apiUrl = "https://script.google.com/macros/s/AKfycby7tEz6S5AoCbqjXz87rvcyzrsL3gGq2-Z77qLbuDP3QgTBg5Lrem2s-d1qUWhxNEWntg/exec";
+            const tableBody = document.querySelector("#data-table");
+            const dataCount = document.querySelector("#data-count");
+
+            tableBody.innerHTML = "<tr><td colspan='13' class='text-center'>Đang tải dữ liệu...</td></tr>";
+            dataCount.innerHTML = "Đang tải dữ liệu...";
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Không thể kết nối đến API.");
+                
+                rawData = await response.json();
+                displayData(rawData);
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan='13' class='text-center text-danger'>Lỗi: ${error.message}</td></tr>`;
+                dataCount.innerHTML = "Lỗi khi tải dữ liệu, vui lòng thử lại.";
+            }
         }
 
-        function submitCarRequest() {
-            let data = {
-                action: 'add',
-                seller: $('#seller').val(),
-                carModel: $('#carModel').val(),
-                version: $('#version').val(),
-                exterior: $('#exterior').val(),
-                interior: $('#interior').val(),
-                orderNumber: $('#orderNumber').val(),
-                customer: $('#customer').val(),
-                depositDate: $('#depositDate').val(),
-                paymentStatus: $('#paymentStatus').val()
-            };
-
-            $.post(API_URL, data, function(response) {
-                alert(response.message);
-                fetchData();
-                $('#carForm')[0].reset();
-            }, 'json');
-        }
-
-        function renderTable(data) {
-            let table = $('#carTable').DataTable({ destroy: true });
-            table.clear();
-            data.forEach((row, index) => {
-                table.row.add([
-                    row.seller, row.carModel, row.version, row.exterior, row.interior, row.orderNumber, row.customer, row.depositDate, row.paymentStatus,
-                    `<button class='btn btn-warning btn-sm' onclick='editCar(${index})'>✏️</button>
-                     <button class='btn btn-danger btn-sm' onclick='deleteCar(${index})'>🗑️</button>`
-                ]).draw(false);
+        function sortTable(columnIndex) {
+            rawData.sort((a, b) => {
+                let valA = Object.values(a)[columnIndex];
+                let valB = Object.values(b)[columnIndex];
+                return (valA > valB ? 1 : -1) * sortDirection;
             });
+            sortDirection *= -1;
+            displayData(rawData);
         }
 
-        $(document).ready(function() {
-            fetchData();
-            $('#submitBtn').on('click', submitCarRequest);
-        });
+        function applyFilters() {
+            const keyword = document.querySelector("#search-keyword").value.toLowerCase();
+            const filteredData = rawData.filter(row => 
+                Object.values(row).some(value => value.toString().toLowerCase().includes(keyword))
+            );
+            displayData(filteredData);
+        }
+
+        function displayData(data) {
+            const tableBody = document.querySelector("#data-table");
+            const dataCount = document.querySelector("#data-count");
+
+            if (data.length > 0) {
+                tableBody.innerHTML = "";
+                dataCount.innerHTML = `Tổng số đơn: ${data.length}`;
+                data.forEach((row, index) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${row["Tư Vấn BH"]}</td>
+                        <td>${row["Dòng Xe"]}</td>
+                        <td>${row["Phiên Bản"]}</td>
+                        <td>${row["Ngoại Thất"]}</td>
+                        <td>${row["Nội Thất"]}</td>
+                        <td>${row["VSO"]}</td>
+                        <td>${row["Tên Khách Hàng"]}</td>
+                        <td>${row.VIN}</td>
+                        <td>${row["Ngày Ghép"]}</td>
+                        <td>${row["Số Ngày"]}</td>
+                        <td>${row["Vị Trí Xe"]}</td>
+                        <td>${row["Note"]}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+        }
+
+        fetchData();
     </script>
 </body>
 </html>
