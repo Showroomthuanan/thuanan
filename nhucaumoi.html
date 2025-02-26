@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Ghép Xe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); }
+        h2 { text-align: center; margin-bottom: 20px; font-weight: bold; color: #007bff; }
+        table { background: white; }
+        th { background-color: #007bff; color: white; }
+        .input-group-text { background-color: #007bff; color: white; }
+        .loading { display: none; text-align: center; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2><i class="fa-solid fa-car"></i> NHU CẦU GHÉP XE</h2>
+        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
+        <form id="carForm" class="mb-4">
+            <div class="row g-3">
+                <input type="hidden" id="editIndex">
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🛋️ Nội thất" id="interior"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="🆔 Số đơn hàng" id="orderNumber"></div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="👤 Tên khách hàng" id="customer"></div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                        <input type="date" class="form-control" id="depositDate">
+                    </div>
+                </div>
+                <div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-primary" id="submitBtn">
+                        <i class="fa-solid fa-plus"></i> Thêm yêu cầu
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table id="carTable" class="table table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>Tư vấn bán hàng</th>
+                    <th>Dòng xe</th>
+                    <th>Phiên bản</th>
+                    <th>Ngoại thất</th>
+                    <th>Nội thất</th>
+                    <th>Số đơn hàng</th>
+                    <th>Tên khách hàng</th>
+                    <th>Ngày cọc</th>
+                    <th>Tình trạng thanh toán</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+        function fetchData() {
+            $('.loading').show();
+            $.get(API_URL, { action: 'get' }, function(response) {
+                $('.loading').hide();
+                console.log("API Response:", response);
+                if (response.data) {
+                    $('#carTable').DataTable().clear().destroy();
+                    renderTable(response.data);
+                }
+            }, 'json');
+        }
+
+        function submitCarRequest() {
+            let data = {
+                action: 'add',
+                seller: $('#seller').val(),
+                carModel: $('#carModel').val(),
+                version: $('#version').val(),
+                exterior: $('#exterior').val(),
+                interior: $('#interior').val(),
+                orderNumber: $('#orderNumber').val(),
+                customer: $('#customer').val(),
+                depositDate: $('#depositDate').val(),
+                paymentStatus: $('#paymentStatus').val()
+            };
+
+            $.post(API_URL, data, function(response) {
+                alert(response.message);
+                fetchData();
+                $('#carForm')[0].reset();
+            }, 'json');
+        }
+
+        function renderTable(data) {
+            let table = $('#carTable').DataTable({ destroy: true });
+            table.clear();
+            data.forEach((row, index) => {
+                table.row.add([
+                    row.seller, row.carModel, row.version, row.exterior, row.interior, row.orderNumber, row.customer, row.depositDate, row.paymentStatus,
+                    `<button class='btn btn-warning btn-sm' onclick='editCar(${index})'>✏️</button>
+                     <button class='btn btn-danger btn-sm' onclick='deleteCar(${index})'>🗑️</button>`
+                ]).draw(false);
+            });
+        }
+
+        $(document).ready(function() {
+            fetchData();
+            $('#submitBtn').on('click', submitCarRequest);
+        });
+    </script>
+</body>
+</html>
