@@ -1,125 +1,151 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quản lý Ghép Xe</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-<style>
-body { background-color: #f4f4f9; }
-.container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-h2 { text-align: center; color: #343a40; }
-.table-container { max-height: 400px; overflow-y: auto; }
-.btn-custom { margin-right: 10px; }
-.hidden { display: none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Ghép Xe</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw6dac8f1c/images/vfast/Hinh-anh-xe-SUV-VinFast-President-gia-xe-thong-so-bang-mau-dong-co-v8.jpg') no-repeat center center/cover;
+            color: white;
+        }
+        .container {
+            display: flex;
+            width: 800px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        .left-panel, .right-panel {
+            flex: 1;
+            padding: 50px;
+        }
+        .left-panel {
+            background: rgba(255, 255, 255, 0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .right-panel h2 {
+            font-size: 26px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ff7e5f, #ff6b81);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .menu {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .menu a {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .menu a:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<div id="loginContainer" class="container mt-5">
-<h2 class="text-center">Đăng Nhập</h2>
-<div class="mb-3">
-<label for="username" class="form-label">Tên đăng nhập</label>
-<input type="text" id="username" class="form-control">
-</div>
-<div class="mb-3">
-<label for="password" class="form-label">Mật khẩu</label>
-<input type="password" id="password" class="form-control">
-</div>
-<button id="loginBtn" class="btn btn-primary w-100">Đăng nhập</button>
-</div>
+    <div class="container" id="login-container">
+        <div class="left-panel">
+            <h2>Showroom VF Minh Đạo Thuận An</h2>
+            <p>Đăng nhập để quản lý đơn hàng của bạn dễ dàng và hiệu quả.</p>
+        </div>
+        <div class="right-panel">
+            <h2>Đăng Nhập</h2>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Tên đăng nhập">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Nhập mật khẩu">
+            </div>
+            <button class="btn" onclick="login()">Đăng Nhập</button>
+            <p id="error-message" style="color:#ff4c4c; display: none;">Sai tên đăng nhập hoặc mật khẩu</p>
+        </div>
+    </div>
 
-<div id="mainContent" class="container mt-4 hidden">
-<h2><i class="fa-solid fa-car"></i> Hệ Thống Quản Lý Ghép Xe</h2>
-<div class="d-flex justify-content-between mb-3">
-<button class="btn btn-success btn-custom" id="loadData"><i class="fa-solid fa-sync"></i> Tải Dữ Liệu</button>
-<button class="btn btn-primary btn-custom" id="exportData"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
-</div>
-<form id="carForm" class="mb-4 hidden">
-<div class="row">
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🧑‍💼 Tư vấn bán hàng" id="seller"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🚗 Dòng xe" id="carModel"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🔢 Phiên bản" id="version"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🎨 Ngoại thất" id="exterior"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🛋️ Nội thất" id="interior"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="🆔 Số đơn hàng" id="orderNumber"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="👤 Tên khách hàng" id="customer"></div>
-<div class="col-md-3"><input type="date" class="form-control" id="depositDate"></div>
-<div class="col-md-3"><input type="text" class="form-control" placeholder="💰 Tình trạng thanh toán" id="paymentStatus"></div>
-<div class="col-md-3">
-<button type="button" class="btn btn-warning" id="requestApproval"><i class="fa-solid fa-paper-plane"></i> Gửi Phê Duyệt</button>
-</div>
-</div>
-</form>
-<div class="table-container">
-<table class="table table-striped text-center">
-<thead class="table-dark">
-<tr>
-<th>Tư vấn bán hàng</th>
-<th>Dòng xe</th>
-<th>Phiên bản</th>
-<th>Ngoại thất</th>
-<th>Nội thất</th>
-<th>Số đơn hàng</th>
-<th>Tên khách hàng</th>
-<th>Ngày cọc</th>
-<th>Tình trạng thanh toán</th>
-<th class="admin-only">Số VIN</th>
-<th class="admin-only">Ngày Nhập</th>
-<th class="admin-only">Vị Trí Xe</th>
-<th>Trạng thái</th>
-<th class="admin-only">Phê Duyệt</th>
-</tr>
-</thead>
-<tbody id="carList"></tbody>
-</table>
-</div>
-</div>
-<script>
-let isAdmin = false;
+    <div class="menu" id="menu" style="display: none;">
+        <h1>Hệ Thống Quản Lý Ghép Xe</h1>
+        <a href="create.html">Tạo Nhu Cầu Ghép Xe</a>
+        <a href="moi.html">Danh Sách Đơn Hàng Đã Ghép Xe</a>
+        <a href="pending_orders.html">Danh Sách Đơn Hàng Chờ Ghép</a>
+        <a href="inventory.html">Tồn Kho Xe</a>
+    </div>
 
-$(document).ready(function() {
-$('#loginBtn').click(function() {
-let username = $('#username').val();
-let password = $('#password').val();
+    <script>
+        function login() {
+            var username = document.getElementById("username").value.trim();
+            var password = document.getElementById("password").value.trim();
+            var errorMessage = document.getElementById("error-message");
+            var loginContainer = document.getElementById("login-container");
+            var menu = document.getElementById("menu");
 
-if (username === "admin" && password === "admin123") {
-isAdmin = true;
-$('#loginContainer').hide();
-$('#mainContent').removeClass('hidden');
-} else if (username === "tvbh" && password === "tvbh123") {
-isAdmin = false;
-$('#loginContainer').hide();
-$('#mainContent').removeClass('hidden');
-$('#carForm').removeClass('hidden');
-} else {
-alert("Sai tên đăng nhập hoặc mật khẩu!");
-}
-});
+            var users = {
+                "admin": "admin123",
+                "TVBH": "tvbh123"
+            };
 
-$('#requestApproval').click(function() {
-let newRow = `<tr>
-<td>${$('#seller').val()}</td>
-<td>${$('#carModel').val()}</td>
-<td>${$('#version').val()}</td>
-<td>${$('#exterior').val()}</td>
-<td>${$('#interior').val()}</td>
-<td>${$('#orderNumber').val()}</td>
-<td>${$('#customer').val()}</td>
-<td>${$('#depositDate').val()}</td>
-<td>${$('#paymentStatus').val()}</td>
-<td class="admin-only"></td>
-<td class="admin-only"></td>
-<td class="admin-only"></td>
-<td><span class="badge bg-warning">Chờ duyệt</span></td>
-<td class="admin-only"><button class="btn btn-success btn-sm approve-btn">Phê Duyệt</button></td>
-</tr>`;
-$('#carList').append(newRow);
-$('#carForm')[0].reset();
-});
-});
-</script>
+            if (users[username] && users[username] === password) {
+                Toastify({
+                    text: "Đăng nhập thành công!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "green",
+                }).showToast();
+
+                setTimeout(() => {
+                    loginContainer.style.display = "none";
+                    menu.style.display = "block";
+                    window.location.href = "moi.html"; // Điều hướng tự động sau khi đăng nhập
+                }, 2000);
+            } else {
+                errorMessage.style.display = "block";
+            }
+        }
+    </script>
 </body>
 </html>
